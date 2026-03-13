@@ -1,0 +1,1872 @@
+﻿@{
+    ViewBag.Title = "Login";
+    Layout = "~/Views/Shared/Farmowner.cshtml";
+}
+
+<style>
+    /* Modern Dashboard Styles - Only affecting cards and layout, NOT modal or datatable */
+    :root {
+        --primary: #4361ee;
+        --secondary: #3f37c9;
+        --success: #4cc9f0;
+        --danger: #f72585;
+        --warning: #f8961e;
+        --info: #4895ef;
+        --dark: #1e1e2f;
+        --light: #f8f9fa;
+        --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --gradient-success: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        --gradient-info: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        --gradient-warning: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        --gradient-danger: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        --shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
+        --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+        --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+        --shadow-hover: 0 20px 25px -5px rgba(0,0,0,0.2);
+    }
+
+    body {
+        background: #f3f4f6;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    /* Modern Card Styles - ONLY for dashboard cards, NOT affecting modal */
+    .dashboard-card {
+        position: relative;
+        border: none;
+        border-radius: 20px;
+        overflow: hidden;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        cursor: pointer;
+        background: white;
+        box-shadow: var(--shadow-sm);
+    }
+
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .dashboard-card .card-body {
+            padding: 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .dashboard-card h6 {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.9;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .dashboard-card h3 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0;
+            line-height: 1.2;
+        }
+
+        .dashboard-card .card-icon {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 3rem;
+            opacity: 0.2;
+            color: white;
+        }
+
+    /* Card Gradients */
+    .card-primary {
+        background: var(--gradient-primary);
+        color: white;
+    }
+
+    .card-success {
+        background: var(--gradient-success);
+        color: white;
+    }
+
+    .card-info {
+        background: var(--gradient-info);
+        color: white;
+    }
+
+    .card-warning {
+        background: var(--gradient-warning);
+        color: white;
+    }
+
+    .card-danger {
+        background: var(--gradient-danger);
+        color: white;
+    }
+
+    .card-dark {
+        background: var(--dark);
+        color: white;
+    }
+
+    /* Stats Sub-card - ONLY for the bookings card */
+    .stats-subcard {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 12px;
+        padding: 10px;
+        margin-top: 10px;
+        backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
+    }
+
+        .stats-subcard p {
+            margin-bottom: 0;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+            .stats-subcard p:hover {
+                transform: translateX(5px);
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: 8px;
+                padding-left: 8px;
+            }
+
+        .stats-subcard b {
+            font-size: 1.1rem;
+            margin-left: auto;
+        }
+
+    /* Chart Container Styles - Modern cards for charts */
+    .chart-container {
+        border: none;
+        border-radius: 24px;
+        background: white;
+        box-shadow: var(--shadow-md);
+        transition: all 0.3s ease;
+        overflow: hidden;
+        margin-bottom: 24px;
+    }
+
+        .chart-container:hover {
+            box-shadow: var(--shadow-lg);
+        }
+
+        .chart-container .card-header {
+            background: white;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            padding: 1.5rem 1.5rem 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+            .chart-container .card-header h5 {
+                margin: 0;
+                font-weight: 600;
+                color: var(--dark);
+                font-size: 1.1rem;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+    /* Modern Select Dropdown - ONLY for chart filters */
+    .modern-select {
+        border: 1px solid #e0e0e0;
+        border-radius: 12px;
+        padding: 8px 16px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: var(--dark);
+        background: white;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        outline: none;
+        min-width: 140px;
+    }
+
+        .modern-select:hover {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        }
+
+        .modern-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+
+    /* Animation Classes - ONLY for entrance animations */
+    .fade-in {
+        animation: fadeIn 0.5s ease-in;
+    }
+
+    .slide-up {
+        animation: slideUp 0.5s ease-out;
+    }
+
+    @*@keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    @keyframes slideUp {
+        from {
+            transform: translateY(20px);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;*@
+        }
+    }
+
+    /* Preserve Original Modal Styling - EXACTLY as before */
+    .modal-content {
+        border-radius: 14px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.25);
+    }
+
+    .modal-header {
+        border-top-left-radius: 14px;
+        border-top-right-radius: 14px;
+    }
+
+    .custom-header {
+        background: linear-gradient(90deg, #0f2f57, #1f4e8c);
+        color: white;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        text-transform: capitalize;
+        border-bottom: 3px solid #0a1f3d;
+    }
+
+        .custom-header .modal-title {
+            color: white;
+            font-size: 20px;
+        }
+
+    /* Preserve Original DataTable Styling - EXACTLY as before */
+    #dataTable {
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+        #dataTable thead th {
+            background: linear-gradient(90deg,#1f3b63,#2f5d9a);
+            color: white;
+            font-size: 15px;
+        }
+
+        #dataTable tbody tr:hover {
+            background: #f4f7fb;
+            transition: 0.2s;
+        }
+
+        #dataTable tbody td {
+            font-size: 14px;
+            padding: 10px !important;
+        }
+
+    #listModal table {
+        border: 2px solid #000;
+        width: 100% !important;
+    }
+
+        #listModal table th,
+        #listModal table td {
+            border: 2px solid #000 !important;
+            text-align: center;
+            vertical-align: middle;
+            padding: 8px !important;
+        }
+
+    #listModal thead th {
+        background-color: #1f3b63 !important;
+        color: white;
+        font-weight: 600;
+    }
+
+    /* DataTables wrapper styling - preserved */
+    .dataTables_wrapper .dataTables_length,
+    .dataTables_wrapper .dataTables_filter,
+    .dataTables_wrapper .dataTables_info,
+    .dataTables_wrapper .dataTables_paginate {
+        margin: 10px 0;
+    }
+
+        .dataTables_wrapper .dataTables_filter input {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 5px 10px;
+            margin-left: 5px;
+        }
+
+        .dataTables_wrapper .dataTables_length select {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 5px;
+            margin: 0 5px;
+        }
+
+    .dt-buttons {
+        margin-bottom: 15px;
+        float: left;
+    }
+
+    .dt-button {
+        background: #1f3b63 !important;
+        color: white !important;
+        border: none !important;
+        border-radius: 4px !important;
+        padding: 8px 15px !important;
+        margin-right: 5px !important;
+        font-size: 14px !important;
+        cursor: pointer;
+    }
+
+        .dt-button:hover {
+            background: #0f2f57 !important;
+        }
+
+    .dataTables_filter {
+        float: right;
+    }
+
+    .dataTables_length {
+        float: left;
+    }
+
+    .dataTables_wrapper:after {
+        content: "";
+        display: table;
+        clear: both;
+    }
+
+    @*/* Responsive adjustments - ONLY for dashboard cards */
+    @media (max-width: 768px) {
+        .dashboard-card h3 {
+            font-size: 1.5rem;
+        }*@
+
+        .chart-container .card-header {
+            flex-direction: column;
+            gap: 10px;
+            align-items: flex-start;
+        }
+
+        .modern-select {
+            width: 100%;
+        }
+    }
+
+    /* Additional modern touches - ONLY for dashboard elements */
+    .btn-close-white {
+        filter: brightness(0) invert(1);
+    }
+</style>
+
+<!-- Main Dashboard Content -->
+<div class="container-fluid py-4">
+    <!-- Stats Cards Row -->
+    <div class="row g-4 mb-4">
+        <!-- Total Booking Card -->
+        <div class="col-lg-2 col-md-4 col-sm-6">
+            <div class="dashboard-card card-primary slide-up" style="animation-delay: 0.1s"
+                 onclick="loadList('ListTotalbookingMG','Total Booking List')">
+                <div class="card-body">
+                    <h6>Total Booking</h6>
+                    <h3>@ViewBag.TotalBooking</h3>
+                    <i class="fas fa-calendar-check card-icon"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Weekly Earnings Card -->
+        <div class="col-lg-2 col-md-4 col-sm-6">
+            <div class="dashboard-card card-success slide-up" style="animation-delay: 0.2s"
+                 onclick="loadList('ListWeeklybookingMG','Weekly Booking List')">
+                <div class="card-body">
+                    <h6>Weekly Earnings</h6>
+                    <h3>₹@ViewBag.WeeklyEarning</h3>
+                    <i class="fas fa-chart-line card-icon"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Monthly Earnings Card -->
+        <div class="col-lg-2 col-md-4 col-sm-6">
+            <div class="dashboard-card card-info slide-up" style="animation-delay: 0.3s"
+                 onclick="loadList('ListMonthlybookingMG','Monthly Booking List')">
+                <div class="card-body">
+                    <h6>Monthly Earnings</h6>
+                    <h3>₹@ViewBag.MonthlyEarning</h3>
+                    <i class="fas fa-chart-bar card-icon"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bookings Card -->
+        <div class="col-lg-2 col-md-4 col-sm-6">
+            <div class="dashboard-card card-warning slide-up" style="animation-delay: 0.4s">
+                <div class="card-body">
+                    <h6>Bookings</h6>
+                    <div class="stats-subcard">
+                        <p onclick="loadList('ListUpcomingbookingMG','Upcoming Booking List')">
+                            <i class="fas fa-clock"></i> Upcoming
+                            <b>@ViewBag.UpcomingBooking</b>
+                        </p>
+                        <p onclick="loadList('ListCancleedbookingMG','Cancelled Booking List')">
+                            <i class="fas fa-times-circle"></i> Cancelled
+                            <b>@ViewBag.CancelledBooking</b>
+                        </p>
+                    </div>
+                    <i class="fas fa-bookmark card-icon"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Subscription Card -->
+        <div class="col-lg-2 col-md-4 col-sm-6">
+            <div class="dashboard-card card-danger slide-up" style="animation-delay: 0.5s"
+                 onclick="loadList('ListCurrentSubscriptionMG','Subscription List')">
+                <div class="card-body">
+                    <h6>Subscription</h6>
+                    <h5 style="font-size: 1.2rem;">@ViewBag.PlanName</h5>
+                    <p style="font-size: 0.9rem; opacity: 0.9;">
+                        <i class="fas fa-hourglass-half me-1"></i> Expires in @ViewBag.DaysLeft days
+                    </p>
+                    <i class="fas fa-crown card-icon"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Closed Farmhouses Card -->
+        <div class="col-lg-2 col-md-4 col-sm-6">
+            <div class="dashboard-card card-dark slide-up" style="animation-delay: 0.6s"
+                 onclick="loadList('ListClosedFarmHouseMG','Closed FarmHouse List')">
+                <div class="card-body">
+                    <h6>Closed Farmhouses</h6>
+                    <h3>@ViewBag.ClosedFarmhouse</h3>
+                    <i class="fas fa-home card-icon"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row 1 -->
+    <div class="row g-4">
+        <!-- Revenue Chart -->
+        <div class="col-lg-6">
+            <div class="chart-container slide-up" style="animation-delay: 0.7s">
+                <div class="card-header">
+                    <h5>
+                        <i class="fas fa-chart-pie text-primary me-2"></i>
+                        Revenue Overview
+                    </h5>
+                    <select id="revenueFilter" class="modern-select">
+                        <option value="6M">Last 6 Months</option>
+                        <option value="1M">This Month</option>
+                        <option value="1Y">This Year</option>
+                    </select>
+                </div>
+                <div class="p-4">
+                    <div id="revenueChart" style="height:350px;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Package Chart -->
+        <div class="col-lg-6">
+            <div class="chart-container slide-up" style="animation-delay: 0.8s">
+                <div class="card-header">
+                    <h5>
+                        <i class="fas fa-cube text-success me-2"></i>
+                        Package Analysis
+                    </h5>
+                    <select id="packageFilter" class="modern-select">
+                        <option value="6M">Last 6 Months</option>
+                        <option value="1M">This Month</option>
+                        <option value="1Y">This Year</option>
+                    </select>
+                </div>
+                <div class="p-4">
+                    <div id="packageChart" style="height:350px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row 2 -->
+    <div class="row g-4 mt-2">
+        <!-- Farmhouse Chart -->
+        <div class="col-lg-6">
+            <div class="chart-container slide-up" style="animation-delay: 0.9s">
+                <div class="card-header">
+
+                    <h5>
+                        <i class="fas fa-tree text-info me-2"></i>
+                        Farmhouse Performance
+                    </h5>
+
+                    <div style="display:flex; gap:8px; align-items:center;">
+
+                        <select id="farmhouseFilter" class="modern-select small-filter">
+                            <option value="6M">Last 6 Months</option>
+                            <option value="1M">This Month</option>
+                            <option value="1Y">This Year</option>
+                        </select>
+
+                        <select id="farmNameFilter" class="modern-select small-filter">
+                            <option value="All">All Farm</option>
+                        </select>
+
+                    </div>
+
+                </div>
+                <div class="p-4">
+                    <div id="farmhouseChart" style="height:350px;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Booking Status Chart -->
+        <div class="col-lg-6">
+            <div class="chart-container slide-up" style="animation-delay: 1s">
+                <div class="card-header">
+                    <h5>
+                        <i class="fas fa-chart-pie text-warning me-2"></i>
+                        Booking Status Overview
+                    </h5>
+                    <select id="bookingFilter" class="modern-select">
+                        <option value="6M">Last 6 Months</option>
+                        <option value="1M">This Month</option>
+                        <option value="1Y">This Year</option>
+                    </select>
+                </div>
+                <div class="p-4">
+                    <div id="bookingStatusChart" style="height:350px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ORIGINAL MODAL - EXACTLY as before, no position changes -->
+<div class="modal fade" id="listModal" data-bs-backdrop="static">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header custom-header">
+                <h5 class="modal-title w-100 text-center" id="modalTitle"></h5>
+                <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-bordered table-striped text-center align-middle display" id="dataTable" style="width:100%">
+                    <thead class="table-dark">
+                        <tr id="modalHead"></tr>
+                    </thead>
+                    <tbody id="modalBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Libraries -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css">
+
+<!-- DataTables JS -->
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
+
+<!-- Export Libraries -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+<!-- Highcharts -->
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/modules/export-data.js"></script>
+<script src="https://code.highcharts.com/modules/accessibility.js"></script>
+<script src="https://code.highcharts.com/highcharts-3d.js"></script>
+
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- Your EXACT ORIGINAL JavaScript - No changes -->
+<script>
+    let currentFlag = "";
+    let currentTitle = "";
+
+    function loadList(flag, title) {
+        currentFlag = flag;
+        currentTitle = title;
+
+        $("#modalTitle").text(title + " (Loading...)");
+
+        $.ajax({
+            url: "/FarmOwner/GetListMG",
+            type: "GET",
+            data: { flag: flag },
+
+            success: function (data) {
+                $("#modalTitle").text(title);
+
+                if ($.fn.DataTable.isDataTable('#dataTable')) {
+                    $('#dataTable').DataTable().clear().destroy();
+                }
+
+                $('#dataTable thead').html('<tr id="modalHead"></tr>');
+                $('#dataTable tbody').empty();
+
+                let head = "";
+                let rows = "";
+
+                // ===== HEADERS =====
+                if (flag === "ListTotalbookingMG") {
+                    head = `
+                    <th style="width:40px"><input type="checkbox" id="selectAll"></th>
+                    <th>Sr No</th>
+                    <th>FarmHouse Name</th>
+                    <th>Booking Date</th>
+                    <th>No Of Guest</th>
+                    <th>Location</th>`;
+                }
+                else if (flag === "ListWeeklybookingMG") {
+                    head = `
+                    <th style="width:40px"><input type="checkbox" id="selectAll"></th>
+                     <th>Sr No</th>
+                    <th>Visitor Name</th>
+                    <th>Package Name</th>
+                    <th>Booking Date</th>
+                    <th>No Of Guest</th>
+                    <th>Daily Amount (₹)</th>
+                    <th>Booking Amount (₹)</th>
+                    <th>Weekly Amount (₹)</th>`;
+                }
+                else if (flag === "ListMonthlybookingMG") {
+                    head = `
+                    <th style="width:40px"><input type="checkbox" id="selectAll"></th>
+                    <th>Sr No</th>
+                    <th>Package Name</th>
+                    <th>Month Name</th>
+                    <th>Month Number</th>
+                    <th>Year Number</th>
+                    <th>Total Revenue (₹)</th>`;
+                }
+                else if (flag === "ListUpcomingbookingMG") {
+                    head = `
+                    <th style="width:40px"><input type="checkbox" id="selectAll"></th>
+                    <th>Sr No</th>
+                    <th>Farm House Name</th>
+                    <th>Visitor Name</th>
+                    <th>No Of Guest</th>
+                    <th>Total Amount (₹)</th>
+                    <th>Status</th>`;
+                }
+                else if (flag === "ListCancleedbookingMG") {
+                    head = `
+                    <th style="width:40px"><input type="checkbox" id="selectAll"></th>
+                    <th>Sr No</th>
+                    <th>Farm House Name</th>
+                    <th>Visitor Name</th>
+                    <th>Booking Date</th>
+                    <th>Check In Date</th>
+                    <th>No Of Guest</th>
+                    <th>Total Amount (₹)</th>
+                    <th>Status</th>`;
+                }
+                else if (flag === "ListCurrentSubscriptionMG") {
+                    head = `
+                    <th style="width:40px"><input type="checkbox" id="selectAll"></th>
+                    <th>Sr No</th>
+                    <th>Farm House Name</th>
+                    <th>Plan Name</th>
+                    <th>Purchase Date</th>
+                    <th>End Date</th>
+                    <th>Days Left</th>`;
+                }
+                else if (flag === "ListClosedFarmHouseMG") {
+                    head = `
+    <th style="width:40px"><input type="checkbox" id="selectAll"></th>
+    <th>Sr No</th>
+    <th>Farm House Name</th>
+    <th>Farm Address</th>
+    <th>Status Name</th>
+    <th>Closed Date</th>`;
+                }
+
+                $("#modalHead").html(head);
+
+                // ===== ROWS =====
+                if (!data || data.length === 0) {
+                    let colCount = (head.match(/<th/g) || []).length;
+                    rows = `<tr><td colspan="${colCount}" class="text-center">No Data Found</td></tr>`;
+                }
+                else {
+                    $.each(data, function (i, row) {
+                        rows += "<tr>";
+                        rows += `<td><input type="checkbox" class="rowCheck"></td>`;
+                        rows += `<td>${i + 1}</td>`;
+                        $.each(row, function (j, col) {
+                            if (typeof col === 'string' && col.includes('12:00:00 AM')) {
+                                col = col.split(' ')[0];
+                            }
+                            else if (typeof col === 'number') {
+                                col = col.toLocaleString('en-IN');
+                            }
+                            rows += "<td>" + col + "</td>";
+                        });
+
+                        rows += "</tr>";
+                    });
+                }
+
+                $("#modalBody").html(rows);
+
+                // SHOW MODAL - ORIGINAL POSITION
+                var modal = new bootstrap.Modal(document.getElementById('listModal'));
+                modal.show();
+
+                // ===== INIT DATATABLE - ORIGINAL STYLING =====
+                setTimeout(function () {
+                    if ($('#dataTable tbody tr').length > 0 &&
+                        $('#dataTable tbody td:first').text() !== "No Data Found") {
+
+                        var now = new Date().toLocaleString('en-IN');
+
+                        $('#dataTable').DataTable({
+
+                            destroy: true,
+                            pageLength: 10,
+                            responsive: true,
+                            searching: true,
+                            ordering: true,
+
+                            dom: '<"top"Bfl>rt<"bottom"ip><"clear">',
+
+                            columnDefs: [
+                                {
+                                    targets: 1,
+                                    render: function (data, type, row, meta) {
+                                        return meta.row + 1;
+                                    }
+                                }
+                            ],
+
+                            buttons: [
+
+                                {
+                                    extend: 'excel',
+                                    text: '<i class="fa-solid fa-file-excel"></i>',
+                                    title: currentTitle,
+                                    messageTop: 'Generated on: ' + now,
+
+                                    action: function (e, dt, button, config) {
+
+                                        if ($('.rowCheck:checked').length === 0) {
+                                            alert("Please select at least one row to export");
+                                            return;
+                                        }
+
+                                        if (!confirm("Are you sure you want to download Excel?")) {
+                                            return;
+                                        }
+
+                                        $.fn.dataTable.ext.buttons.excelHtml5.action.call(this, e, dt, button, config);
+
+                                    },
+
+                                    exportOptions: {
+                                        rows: function (idx, data, node) {
+                                            return $(node).find('.rowCheck').prop('checked');
+                                        },
+                                        columns: ':visible:not(:first-child)',
+                                        format: {
+                                            body: function (data, row, column) {
+
+                                                if (column === 0) {
+                                                    return row + 1;
+                                                }
+
+                                                return data;
+
+                                            }
+                                        }
+                                    }
+                                },
+
+                                {
+                                    extend: 'pdf',
+                                    text: '<i class="fa-solid fa-file-pdf"></i>',
+                                    title: currentTitle,
+                                    messageTop: 'Generated on: ' + now,
+
+                                    action: function (e, dt, button, config) {
+
+                                        if ($('.rowCheck:checked').length === 0) {
+                                            alert("Please select at least one row to export");
+                                            return;
+                                        }
+
+                                        if (!confirm("Are you sure you want to download PDF?")) {
+                                            return;
+                                        }
+
+                                        $.fn.dataTable.ext.buttons.pdfHtml5.action.call(this, e, dt, button, config);
+
+                                    },
+
+                                    exportOptions: {
+                                        rows: function (idx, data, node) {
+                                            return $(node).find('.rowCheck').prop('checked');
+                                        },
+                                        columns: ':visible:not(:first-child)',
+                                        format: {
+                                            body: function (data, row, column) {
+
+                                                if (column === 0) {
+                                                    return row + 1;
+                                                }
+
+                                                return data;
+
+                                            }
+                                        }
+                                    },
+
+                                    customize: function (doc) {
+                                        doc.styles.title.alignment = 'center';
+                                        doc.styles.message.alignment = 'center';
+                                    }
+                                },
+
+                                {
+                                    extend: 'print',
+                                    text: '<i class="fa-solid fa-print"></i>',
+                                    title: currentTitle,
+                                    messageTop: 'Generated on: ' + now,
+
+                                    action: function (e, dt, button, config) {
+
+                                        if ($('.rowCheck:checked').length === 0) {
+                                            alert("Please select at least one row to print");
+                                            return;
+                                        }
+
+                                        if (!confirm("Are you sure you want to print this report?")) {
+                                            return;
+                                        }
+
+                                        $.fn.dataTable.ext.buttons.print.action.call(this, e, dt, button, config);
+
+                                    },
+
+                                    exportOptions: {
+                                        rows: function (idx, data, node) {
+                                            return $(node).find('.rowCheck').prop('checked');
+                                        },
+                                        columns: ':visible:not(:first-child)',
+                                        format: {
+                                            body: function (data, row, column) {
+
+                                                if (column === 0) {
+                                                    return row + 1;
+                                                }
+
+                                                return data;
+
+                                            }
+                                        }
+                                    }
+                                }
+
+                            ]
+
+                        });
+                    }
+                }, 200);
+            }
+        });
+    }
+
+    // ===== SELECT ALL =====
+    $(document).on("change", "#selectAll", function () {
+        $(".rowCheck").prop("checked", this.checked);
+    });
+
+    // ===== ROW CHECK =====
+    $(document).on("change", ".rowCheck", function () {
+
+        let total = $(".rowCheck").length;
+        let checked = $(".rowCheck:checked").length;
+
+        if (total === checked) {
+            $("#selectAll").prop("checked", true);
+        } else {
+            $("#selectAll").prop("checked", false);
+        }
+
+    });
+
+    // ===== CLOSE MODAL =====
+    $('#listModal').on('hidden.bs.modal', function () {
+        if ($.fn.DataTable.isDataTable('#dataTable')) {
+            $('#dataTable').DataTable().clear().destroy();
+        }
+        $('#dataTable thead').html('<tr id="modalHead"></tr>');
+        $('#dataTable tbody').empty();
+    });
+
+    // Revenue Chart
+    $(document).ready(function () {
+        loadRevenueChart("6M");
+    });
+
+    $("#revenueFilter").change(function () {
+        let filter = $(this).val();
+        loadRevenueChart(filter);
+    });
+
+    function loadRevenueChart(filterType) {
+        $.ajax({
+            url: "/FarmOwner/GetRevenueChartMG",
+            type: "GET",
+            data: { filterType: filterType },
+            success: function (data) {
+                let categories = [];
+                let values = [];
+
+                $.each(data, function (i, row) {
+                    categories.push(row[0]);
+                    values.push(parseFloat(row[1]));
+                });
+                Highcharts.chart('revenueChart', {
+
+                    chart: {
+                        type: 'column',
+                        backgroundColor: '#ffffff'
+                    },
+
+                    title: {
+                        text: 'Revenue Overview'
+                    },
+
+                    xAxis: {
+                        categories: categories,
+                        type: 'category',
+                        title: {
+                            text: 'Month'
+                        }
+                    }
+                    ,
+                    yAxis: {
+                        title: {
+                            text: 'Revenue (₹)'
+                        }
+                    },
+
+                    tooltip: {
+                        formatter: function () {
+                            return '<b>' + this.point.category + '</b><br/>' +
+                                'Revenue: ₹' + Highcharts.numberFormat(this.y, 0);
+                        }
+                    },
+
+                    plotOptions: {
+                        column: {
+                            borderRadius: 6,
+                            dataLabels: {
+                                enabled: true,
+                                format: '₹{point.y:,.0f}'
+                            }
+                        }
+                    },
+
+                    series: [{
+                        name: 'Revenue',
+                        data: values,
+                        color: '#2f80ed'
+                    }],
+
+                    legend: {
+                        enabled: false
+                    },
+
+                    credits: {
+                        enabled: false
+                    }
+
+                });
+            }
+        });
+    }
+
+    // Package Chart
+    $(document).ready(function () {
+        loadPackageChart("6M");
+    });
+
+    $("#packageFilter").change(function () {
+        let filter = $(this).val();
+        loadPackageChart(filter);
+    });
+
+    function loadPackageChart(filterType) {
+        $.ajax({
+            url: "/FarmOwner/GetPackageChartMG",
+            type: "GET",
+            data: { filterType: filterType },
+            success: function (data) {
+                let categories = [];
+                let seriesData = [];
+
+                $.each(data, function (i, row) {
+                    categories.push(row[1] + " (" + row[0] + ")");
+                    seriesData.push({
+                        y: parseInt(row[3]),
+                        price: parseFloat(row[2]),
+                        month: row[0]
+                    });
+                });
+
+                Highcharts.chart('packageChart', {
+                    chart: {
+                        type: 'bar',
+                        backgroundColor: '#ffffff'
+                    },
+                    title: {
+                        text: 'Package By Visitor Overview'
+                    },
+                    xAxis: {
+                        categories: categories,
+                        title: {
+                            text: 'Packages'
+                        }
+                    },
+                    yAxis: {
+                        min: 0,
+                        title: {
+                            text: 'Total Bookings'
+                        }
+                    },
+                    tooltip: {
+                        formatter: function () {
+                            return '<b>' + this.x + '</b><br/>' +
+                                'Month: ' + this.point.month + '<br/>' +
+                                'Bookings: ' + this.y + '<br/>' +
+                                'Price: ₹' + Highcharts.numberFormat(this.point.price, 0);
+                        }
+                    },
+                    plotOptions: {
+                        bar: {
+                            borderRadius: 6,
+                            dataLabels: {
+                                enabled: true,
+                                format: '{point.y}'
+                            }
+                        }
+                    },
+                    series: [{
+                        name: 'Bookings',
+                        data: seriesData,
+                        color: '#27ae60'
+                    }],
+                    credits: {
+                        enabled: false
+                    }
+                });
+            }
+        });
+    }
+
+    // Farmhouse Chart
+    $(document).ready(function () {
+
+        loadFarmhouseChart("6M");
+
+    });
+
+    // time filter
+    $("#farmhouseFilter").change(function () {
+
+        let filter = $(this).val();
+        loadFarmhouseChart(filter);
+
+    });
+
+    // farm name filter
+    $("#farmNameFilter").change(function () {
+
+        let farm = $(this).val();
+
+        if (farm === "All") {
+
+            drawFarmChart(fullFarmData);
+            return;
+
+        }
+
+        let filtered = fullFarmData.filter(x => x[1] === farm);
+
+        drawFarmChart(filtered);
+
+    });
+
+    // load data
+    function loadFarmhouseChart(filterType) {
+
+        $.ajax({
+
+            url: "/FarmOwner/GetFarmhouseBookingChartMG",
+            type: "GET",
+            data: { filterType: filterType },
+
+            success: function (data) {
+
+                fullFarmData = data;
+
+                fillFarmDropdown(data);
+
+                drawFarmChart(data);
+
+            }
+
+        });
+
+    }
+
+    // fill farm dropdown
+    function fillFarmDropdown(data) {
+
+        let farms = [];
+
+        $("#farmNameFilter").empty();
+        $("#farmNameFilter").append('<option value="All">All Farm</option>');
+
+        $.each(data, function (i, row) {
+
+            if (!farms.includes(row[1])) {
+
+                farms.push(row[1]);
+
+                $("#farmNameFilter").append(
+                    '<option value="' + row[1] + '">' + row[1] + '</option>'
+                );
+
+            }
+
+        });
+
+    }
+
+    // draw chart
+    function drawFarmChart(data) {
+
+        let categories = [];
+        let seriesData = [];
+
+        $.each(data, function (i, row) {
+
+            categories.push(row[1]);
+
+            seriesData.push({
+                name: row[1],
+                y: parseInt(row[2]),
+                month: row[0]
+            });
+
+        });
+
+        Highcharts.chart('farmhouseChart', {
+
+            chart: {
+                type: 'column',
+                options3d: {
+                    enabled: true,
+                    alpha: 15,
+                    beta: 20,
+                    depth: 70,
+                    viewDistance: 25
+                }
+            },
+
+            title: {
+                text: 'Farmhouse Booking Analysis'
+            },
+
+            xAxis: {
+                categories: categories,
+                title: {
+                    text: 'Farmhouse Name'
+                }
+            },
+
+            yAxis: {
+                min: 0,
+                title: {
+                    text: 'Total Bookings'
+                }
+            },
+
+            tooltip: {
+                formatter: function () {
+
+                    return '<b>' + this.point.name + '</b><br/>' +
+                        'Month: ' + this.point.month + '<br/>' +
+                        'Bookings: ' + this.y;
+
+                }
+            },
+
+            plotOptions: {
+                column: {
+                    color: '#7FC8C3',
+                    dataLabels: {
+                        enabled: true
+                    }
+                }
+            },
+
+            series: [{
+                name: 'FarmHouse Name',
+                data: seriesData
+            }],
+
+            credits: {
+                enabled: false
+            }
+
+        });
+
+    }
+
+    // Booking Status Chart
+    $(document).ready(function () {
+        loadBookingStatusChart("6M");
+    });
+
+    $("#bookingFilter").change(function () {
+        let filter = $(this).val();
+        loadBookingStatusChart(filter);
+    });
+
+    function loadBookingStatusChart(filterType) {
+        $.ajax({
+            url: "/FarmOwner/GetBookingStatusChartMG",
+            type: "GET",
+            data: { filterType: filterType },
+            success: function (data) {
+                Highcharts.chart('bookingStatusChart', {
+                    chart: {
+                        type: 'pie'
+                    },
+                    title: {
+                        text: ''
+                    },
+                    tooltip: {
+                        pointFormat: '<b>{point.y}</b> bookings'
+                    },
+                    plotOptions: {
+                        pie: {
+                            allowPointSelect: true,
+                            cursor: 'pointer',
+                            dataLabels: {
+                                enabled: true,
+                                format: '{point.name}: {point.y}'
+                            },
+                            showInLegend: true
+                        }
+                    },
+                    series: [{
+                        name: 'Bookings',
+                        colorByPoint: true,
+                        data: [
+                            { name: 'Completed', y: parseInt(data[0][0]), color: '#5B6BD5' },
+                            { name: 'Cancelled', y: parseInt(data[0][1]), color: '#F06292' },
+                            { name: 'Confirmed', y: parseInt(data[0][2]), color: '#2DB7A3' },
+                            { name: 'Upcoming', y: parseInt(data[0][3]), color: '#7E57C2' }
+                        ]
+                    }],
+                    credits: {
+                        enabled: false
+                    }
+                });
+            }
+        });
+    }
+
+    //-----------------------------------------------Graph Chartlist cliclking ------------------------\\
+    // Revenue Chart 
+    function loadRevenueChart(filterType) {
+        $.ajax({
+            url: "/FarmOwner/GetRevenueChartMG",
+            type: "GET",
+            data: { filterType: filterType },
+            success: function (data) {
+                let categories = [];
+                let values = [];
+
+                $.each(data, function (i, row) {
+                    categories.push(row[0]);
+                    values.push(parseFloat(row[1]));
+                });
+
+                Highcharts.chart('revenueChart', {
+                    chart: {
+                        type: 'column',
+                        backgroundColor: '#ffffff',
+                        events: {
+                            click: function (e) {
+                            }
+                        }
+                    },
+                    title: {
+                        text: 'Revenue Overview'
+                    },
+                    xAxis: {
+                        categories: categories,
+                        type: 'category',
+                        title: {
+                            text: 'Month'
+                        }
+                    },
+                    yAxis: {
+                        title: {
+                            text: 'Revenue (₹)'
+                        }
+                    },
+                    tooltip: {
+                        formatter: function () {
+                            return '<b>' + this.point.category + '</b><br/>' +
+                                'Revenue: ₹' + Highcharts.numberFormat(this.y, 0);
+                        }
+                    },
+                    plotOptions: {
+                        column: {
+                            borderRadius: 6,
+                            dataLabels: {
+                                enabled: true,
+                                format: '₹{point.y:,.0f}'
+                            },
+                            point: {
+                                events: {
+                                    click: function () {
+                                        let month = this.category;
+                                        let revenue = this.y;
+                                        loadRevenueDetailsList(month, filterType);
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    series: [{
+                        name: 'Revenue',
+                        data: values,
+                        color: '#2f80ed'
+                    }],
+                    legend: {
+                        enabled: false
+                    },
+                    credits: {
+                        enabled: false
+                    }
+                });
+            }
+        });
+    }
+
+    // Farmhouse Chart 
+    function drawFarmChart(data) {
+        let categories = [];
+        let seriesData = [];
+
+        $.each(data, function (i, row) {
+            categories.push(row[1]);
+            seriesData.push({
+                name: row[1],
+                y: parseInt(row[2]),
+                month: row[0]
+            });
+        });
+
+        Highcharts.chart('farmhouseChart', {
+            chart: {
+                type: 'column',
+                options3d: {
+                    enabled: true,
+                    alpha: 15,
+                    beta: 20,
+                    depth: 70,
+                    viewDistance: 25
+                }
+            },
+            title: {
+                text: 'Farmhouse Booking Analysis'
+            },
+            xAxis: {
+                categories: categories,
+                title: {
+                    text: 'Farmhouse Name'
+                }
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: 'Total Bookings'
+                }
+            },
+            tooltip: {
+                formatter: function () {
+                    return '<b>' + this.point.name + '</b><br/>' +
+                        'Month: ' + this.point.month + '<br/>' +
+                        'Bookings: ' + this.y;
+                }
+            },
+            plotOptions: {
+                column: {
+                    color: '#7FC8C3',
+                    dataLabels: {
+                        enabled: true
+                    },
+                    point: {
+                        events: {
+                            click: function () {
+                                let farmName = this.name;
+                                let month = this.month;
+                                loadFarmhouseBookingList(farmName, month);
+                            }
+                        }
+                    }
+                }
+            },
+            series: [{
+                name: 'FarmHouse Name',
+                data: seriesData
+            }],
+            credits: {
+                enabled: false
+            }
+        });
+    }
+
+    // Package Chart 
+    function loadPackageChart(filterType) {
+        $.ajax({
+            url: "/FarmOwner/GetPackageChartMG",
+            type: "GET",
+            data: { filterType: filterType },
+            success: function (data) {
+                let categories = [];
+                let seriesData = [];
+
+                $.each(data, function (i, row) {
+                    categories.push(row[1] + " (" + row[0] + ")");
+                    seriesData.push({
+                        y: parseInt(row[3]),
+                        price: parseFloat(row[2]),
+                        month: row[0],
+                        packageName: row[1]
+                    });
+                });
+
+                Highcharts.chart('packageChart', {
+                    chart: {
+                        type: 'bar',
+                        backgroundColor: '#ffffff'
+                    },
+                    title: {
+                        text: 'Package By Visitor Overview'
+                    },
+                    xAxis: {
+                        categories: categories,
+                        title: {
+                            text: 'Packages'
+                        }
+                    },
+                    yAxis: {
+                        min: 0,
+                        title: {
+                            text: 'Total Bookings'
+                        }
+                    },
+                    tooltip: {
+                        formatter: function () {
+                            return '<b>' + this.x + '</b><br/>' +
+                                'Month: ' + this.point.month + '<br/>' +
+                                'Bookings: ' + this.y + '<br/>' +
+                                'Price: ₹' + Highcharts.numberFormat(this.point.price, 0);
+                        }
+                    },
+                    plotOptions: {
+                        bar: {
+                            borderRadius: 6,
+                            dataLabels: {
+                                enabled: true,
+                                format: '{point.y}'
+                            },
+                            point: {
+                                events: {
+                                    click: function () {
+                                        let packageName = this.packageName;
+                                        let month = this.month;
+                                        loadPackageBookingList(packageName, month, filterType);
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    series: [{
+                        name: 'Bookings',
+                        data: seriesData,
+                        color: '#27ae60'
+                    }],
+                    credits: {
+                        enabled: false
+                    }
+                });
+            }
+        });
+    }
+
+    // Revenue Details List
+    function loadRevenueDetailsList(month, filterType) {
+        currentTitle = month + " - Revenue Details";
+        $("#modalTitle").text(currentTitle + " (Loading...)");
+
+        $.ajax({
+            url: "/FarmOwner/GetRevenueDetailsListMG",
+            type: "GET",
+            data: {
+                month: month,
+                filterType: filterType
+            },
+            success: function (data) {
+                $("#modalTitle").text(currentTitle);
+
+                if ($.fn.DataTable.isDataTable('#dataTable')) {
+                    $('#dataTable').DataTable().clear().destroy();
+                }
+
+                $('#dataTable thead').html('<tr id="modalHead"></tr>');
+                $('#dataTable tbody').empty();
+
+                let head = `
+                <th style="width:40px"><input type="checkbox" id="selectAll"></th>
+                <th>Sr No</th>
+                <th>FarmHouse Name</th>
+                <th>Visitor Name</th>
+                <th>Booking Date</th>
+                <th>Package Name</th>
+                <th>No Of Guest</th>
+                <th>Amount (₹)</th>
+                <th>Status</th>`;
+
+                $("#modalHead").html(head);
+
+                let rows = "";
+                if (!data || data.length === 0) {
+                    let colCount = 9;
+                    rows = `<tr><td colspan="${colCount}" class="text-center">No Data Found</td></tr>`;
+                } else {
+                    $.each(data, function (i, row) {
+                        rows += "<tr>";
+                        rows += `<td><input type="checkbox" class="rowCheck"></td>`;
+                        rows += `<td>${i + 1}</td>`;
+                        $.each(row, function (j, col) {
+                            if (typeof col === 'string' && col.includes('12:00:00 AM')) {
+                                col = col.split(' ')[0];
+                            } else if (typeof col === 'number') {
+                                col = col.toLocaleString('en-IN');
+                            }
+                            rows += "<td>" + col + "</td>";
+                        });
+                        rows += "</tr>";
+                    });
+                }
+
+                $("#modalBody").html(rows);
+
+                var modal = new bootstrap.Modal(document.getElementById('listModal'));
+                modal.show();
+
+                // DataTable Initialize
+                setTimeout(function () {
+                    if ($('#dataTable tbody tr').length > 0 &&
+                        $('#dataTable tbody td:first').text() !== "No Data Found") {
+
+                        initializeDataTable();
+                    }
+                }, 200);
+            }
+        });
+    }
+
+    // Farmhouse Booking List 
+    function loadFarmhouseBookingList(farmName, month) {
+        currentTitle = farmName + " - " + month + " Bookings";
+        $("#modalTitle").text(currentTitle + " (Loading...)");
+
+        $.ajax({
+            url: "/FarmOwner/GetFarmhouseBookingsListMG",
+            type: "GET",
+            data: {
+                farmName: farmName,
+                month: month
+            },
+            success: function (data) {
+                $("#modalTitle").text(currentTitle);
+
+                if ($.fn.DataTable.isDataTable('#dataTable')) {
+                    $('#dataTable').DataTable().clear().destroy();
+                }
+
+                $('#dataTable thead').html('<tr id="modalHead"></tr>');
+                $('#dataTable tbody').empty();
+
+                let head = `
+                <th style="width:40px"><input type="checkbox" id="selectAll"></th>
+                <th>Sr No</th>
+                <th>Visitor Name</th>
+                <th>Booking Date</th>
+                <th>Check In Date</th>
+                <th>Check Out Date</th>
+                <th>No Of Guest</th>
+                <th>Total Amount (₹)</th>
+                <th>Status</th>`;
+
+                $("#modalHead").html(head);
+
+                let rows = "";
+                if (!data || data.length === 0) {
+                    let colCount = 9;
+                    rows = `<tr><td colspan="${colCount}" class="text-center">No Data Found</td></tr>`;
+                } else {
+                    $.each(data, function (i, row) {
+                        rows += "<tr>";
+                        rows += `<td><input type="checkbox" class="rowCheck"></td>`;
+                        rows += `<td>${i + 1}</td>`;
+                        $.each(row, function (j, col) {
+                            if (typeof col === 'string' && col.includes('12:00:00 AM')) {
+                                col = col.split(' ')[0];
+                            } else if (typeof col === 'number') {
+                                col = col.toLocaleString('en-IN');
+                            }
+                            rows += "<td>" + col + "</td>";
+                        });
+                        rows += "</tr>";
+                    });
+                }
+
+                $("#modalBody").html(rows);
+
+                var modal = new bootstrap.Modal(document.getElementById('listModal'));
+                modal.show();
+
+                setTimeout(function () {
+                    if ($('#dataTable tbody tr').length > 0 &&
+                        $('#dataTable tbody td:first').text() !== "No Data Found") {
+
+                        initializeDataTable();
+                    }
+                }, 200);
+            }
+        });
+    }
+
+    // Package Booking List
+    function loadPackageBookingList(packageName, month, filterType) {
+        currentTitle = packageName + " - " + month + " Bookings";
+        $("#modalTitle").text(currentTitle + " (Loading...)");
+
+        $.ajax({
+            url: "/FarmOwner/GetPackageBookingsListMG",
+            type: "GET",
+            data: {
+                packageName: packageName,
+                month: month,
+                filterType: filterType
+            },
+            success: function (data) {
+                $("#modalTitle").text(currentTitle);
+
+                if ($.fn.DataTable.isDataTable('#dataTable')) {
+                    $('#dataTable').DataTable().clear().destroy();
+                }
+
+                $('#dataTable thead').html('<tr id="modalHead"></tr>');
+                $('#dataTable tbody').empty();
+
+                let head = `
+                <th style="width:40px"><input type="checkbox" id="selectAll"></th>
+                <th>Sr No</th>
+                <th>FarmHouse Name</th>
+                <th>Visitor Name</th>
+                <th>Booking Date</th>
+                <th>No Of Guest</th>
+                <th>Package Price (₹)</th>
+                <th>Total Amount (₹)</th>
+                <th>Status</th>`;
+
+                $("#modalHead").html(head);
+
+                let rows = "";
+                if (!data || data.length === 0) {
+                    let colCount = 9;
+                    rows = `<tr><td colspan="${colCount}" class="text-center">No Data Found</td></tr>`;
+                } else {
+                    $.each(data, function (i, row) {
+                        rows += "<tr>";
+                        rows += `<td><input type="checkbox" class="rowCheck"></td>`;
+                        rows += `<td>${i + 1}</td>`;
+                        $.each(row, function (j, col) {
+                            if (typeof col === 'string' && col.includes('12:00:00 AM')) {
+                                col = col.split(' ')[0];
+                            } else if (typeof col === 'number') {
+                                col = col.toLocaleString('en-IN');
+                            }
+                            rows += "<td>" + col + "</td>";
+                        });
+                        rows += "</tr>";
+                    });
+                }
+
+                $("#modalBody").html(rows);
+
+                var modal = new bootstrap.Modal(document.getElementById('listModal'));
+                modal.show();
+
+                setTimeout(function () {
+                    if ($('#dataTable tbody tr').length > 0 &&
+                        $('#dataTable tbody td:first').text() !== "No Data Found") {
+
+                        initializeDataTable();
+                    }
+                }, 200);
+            }
+        });
+    }
+
+    // DataTable Initialize 
+    function initializeDataTable() {
+        var now = new Date().toLocaleString('en-IN');
+
+        $('#dataTable').DataTable({
+            destroy: true,
+            pageLength: 10,
+            responsive: true,
+            searching: true,
+            ordering: true,
+            dom: '<"top"Bfl>rt<"bottom"ip><"clear">',
+            columnDefs: [
+                {
+                    targets: 1,
+                    render: function (data, type, row, meta) {
+                        return meta.row + 1;
+                    }
+                }
+            ],
+            buttons: [
+                {
+                    extend: 'excel',
+                    text: '<i class="fa-solid fa-file-excel"></i>',
+                    title: currentTitle,
+                    messageTop: 'Generated on: ' + now,
+                    action: function (e, dt, button, config) {
+                        if ($('.rowCheck:checked').length === 0) {
+                            alert("Please select at least one row to export");
+                            return;
+                        }
+                        if (!confirm("Are you sure you want to download Excel?")) {
+                            return;
+                        }
+                        $.fn.dataTable.ext.buttons.excelHtml5.action.call(this, e, dt, button, config);
+                    },
+                    exportOptions: {
+                        rows: function (idx, data, node) {
+                            return $(node).find('.rowCheck').prop('checked');
+                        },
+                        columns: ':visible:not(:first-child)'
+                    }
+                },
+                {
+                    extend: 'pdf',
+                    text: '<i class="fa-solid fa-file-pdf"></i>',
+                    title: currentTitle,
+                    messageTop: 'Generated on: ' + now,
+                    action: function (e, dt, button, config) {
+                        if ($('.rowCheck:checked').length === 0) {
+                            alert("Please select at least one row to export");
+                            return;
+                        }
+                        if (!confirm("Are you sure you want to download PDF?")) {
+                            return;
+                        }
+                        $.fn.dataTable.ext.buttons.pdfHtml5.action.call(this, e, dt, button, config);
+                    },
+                    exportOptions: {
+                        rows: function (idx, data, node) {
+                            return $(node).find('.rowCheck').prop('checked');
+                        },
+                        columns: ':visible:not(:first-child)'
+                    },
+                    customize: function (doc) {
+                        doc.styles.title.alignment = 'center';
+                        doc.styles.message.alignment = 'center';
+                    }
+                },
+                {
+                    extend: 'print',
+                    text: '<i class="fa-solid fa-print"></i>',
+                    title: currentTitle,
+                    messageTop: 'Generated on: ' + now,
+                    action: function (e, dt, button, config) {
+                        if ($('.rowCheck:checked').length === 0) {
+                            alert("Please select at least one row to print");
+                            return;
+                        }
+                        if (!confirm("Are you sure you want to print this report?")) {
+                            return;
+                        }
+                        $.fn.dataTable.ext.buttons.print.action.call(this, e, dt, button, config);
+                    },
+                    exportOptions: {
+                        rows: function (idx, data, node) {
+                            return $(node).find('.rowCheck').prop('checked');
+                        },
+                        columns: ':visible:not(:first-child)'
+                    }
+                }
+            ]
+        });
+    }
+    // Smooth scrolling and hover effects - ONLY for dashboard elements
+    $(document).ready(function () {
+        $('html, body').css('scroll-behavior', 'smooth');
+
+        // Hover effects ONLY for dashboard cards and chart containers
+        $('.dashboard-card, .chart-container').hover(
+            function () { $(this).css('transform', 'translateY(-5px)'); },
+            function () { $(this).css('transform', 'translateY(0)'); }
+        );
+    });
+
+
+</script>

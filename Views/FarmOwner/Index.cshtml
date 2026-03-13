@@ -1,0 +1,178 @@
+﻿@model DashClassLib.FarmOwner.LoginRS
+
+@{
+    ViewBag.Title = "Login";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    body {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+    }
+
+    .login-wrapper {
+        min-height: 90vh;
+    }
+
+    .login-card {
+        border-radius: 20px;
+        box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+        padding: 40px;
+        background: #ffffff;
+/*        transition: 0.3s;*/
+    }
+/*
+        .login-card:hover {
+            transform: translateY(-5px);
+        }*/
+
+    .form-control {
+        border-radius: 10px;
+    }
+
+    .btn-login {
+        border-radius: 10px;
+        font-weight: 600;
+        background: linear-gradient(90deg,#11998e,#38ef7d);
+        border: none;
+        transition: 0.3s;
+    }
+
+        .btn-login:hover {
+            opacity: 0.9;
+        }
+
+    .link-style {
+        font-size: 14px;
+    }
+    .forgot-btn {
+        display: inline-block;
+        padding: 8px 18px;
+        border-radius: 30px;
+        background: linear-gradient(90deg,#ff416c,#ff4b2b);
+        color: white;
+        text-decoration: none;
+        font-size: 14px;
+        transition: 0.3s;
+    }
+
+        .forgot-btn:hover {
+            transform: scale(1.05);
+            color: white;
+        }
+    .create-owner {
+        display: inline-block;
+        padding: 10px 20px;
+        border-radius: 30px;
+        background: linear-gradient(90deg,#2193b0,#6dd5ed);
+        color: white;
+        text-decoration: none;
+        margin-right: 10px;
+        transition: 0.3s;
+    }
+
+        .create-owner:hover {
+            transform: scale(1.05);
+            color: white;
+        }
+
+    .create-visitor {
+        display: inline-block;
+        padding: 10px 20px;
+        border-radius: 30px;
+        background: linear-gradient(90deg,#f7971e,#ffd200);
+        color: black;
+        text-decoration: none;
+        transition: 0.3s;
+    }
+
+        .create-visitor:hover {
+            transform: scale(1.05);
+        }
+</style>
+
+<div class="container login-wrapper d-flex justify-content-center align-items-center">
+    <div class="col-md-5">
+        <div class="login-card">
+
+            <h3 class="text-center mb-4 fw-bold">Welcome Back 👋</h3>
+
+            @if (ViewBag.Message != null)
+            {
+                <div class="alert alert-danger text-center">
+                    @ViewBag.Message
+                </div>
+            }
+
+            @using (Html.BeginForm("Login", "Home", FormMethod.Post))
+            {
+                <div class="mb-3">
+                    <label>Email</label>
+                    @Html.TextBoxFor(m => m.UserEmail,
+                        new
+                        {
+                            @class = "form-control",
+                            placeholder = "Enter Email",
+                            autocomplete = "off"
+                        })                   
+                    @Html.ValidationMessageFor(m => m.UserEmail, "", new { @class = "text-danger" })
+                    </div>
+
+                <div class="mb-3">
+                    <label>Password</label>
+                    @Html.PasswordFor(m => m.UserPassword,
+                        new
+                        {
+                            @class = "form-control",
+                            placeholder = "Enter Password",
+                            autocomplete = "new-password"
+                        })                   
+                    @Html.ValidationMessageFor(m => m.UserPassword, "", new { @class = "text-danger" })
+                    </div>
+
+                <button type="submit" class="btn btn-login w-100 text-white">
+                    Login
+                </button>
+
+                <div class="text-center mt-3">
+                    <a href="@Url.Action("ForgotPassword","FarmOwner")"
+                       class="forgot-btn">
+                        🔒 Forgot Password?
+                    </a>
+                </div>
+
+                <hr />
+
+                <div class="text-center mt-4">
+                    <p class="fw-bold mb-3">Create Account As</p>
+
+                    <a href="@Url.Action("Register","FarmOwner")"
+                       class="create-owner">
+                        Farm Owner
+                    </a>
+
+                    <a href="@Url.Action("Register","Visitor")"
+                       class="create-visitor">
+                         Visitor
+                    </a>
+                </div>
+            }
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
+
+<script>
+    function showForgot() {
+        var x = document.getElementById("forgotDiv");
+        if (x.style.display === "none") {
+            x.style.display = "block";
+        } else {
+            x.style.display = "none";
+        }
+    }
+</script>
